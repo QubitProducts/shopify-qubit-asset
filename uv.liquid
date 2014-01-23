@@ -1,4 +1,4 @@
-<!-- Qubit Universal Variable -->
+<!-- Qubit Universal Variable start -->
 <script>
 (function () {
 
@@ -100,8 +100,8 @@
         // e.g. subsubcategory, subsubsubcategory
         subcategory: product.tags[0], 
         currency: "GBP",
-        unit_price: product.price,
-        unit_sale_price: product.price_min,
+        unit_price: product.price / 100,
+        unit_sale_price: product.price_min / 100,
 
         // Take the sku_code from the first variant
         sku_code: product.variants[0].sku,
@@ -238,7 +238,7 @@
       uv.basket.line_items.push({
         product: uvProduct,
         quantity: item.quantity,
-        subtotal: item.line_price
+        subtotal: item.line_price / 100
       });
     };
 
@@ -267,3 +267,4 @@
 
 }());
 </script>
+<!-- Qubit Universal Variable end -->
