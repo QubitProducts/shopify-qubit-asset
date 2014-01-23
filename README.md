@@ -19,6 +19,11 @@ __Note__: This repository is not a Shopify App as such, it provides a series of 
 
 #Installation
 
+##Opentag container
+
+Update the Opentag container at the bottom of `uv.liquid` and `uv-transaction.liquid` with your own unique id.
+
+
 ##Sitewide
 
 To install the bulk of the Universal Variable code, copy the `uv.liquid` file from this repository to the `Snippets/` directory, found at "Themes > Template Editor > Snippets".
@@ -47,6 +52,9 @@ Copy the code from `uv-transaction.liquid` in this repository, and paste it into
 
 
 #Changelog
+
+###0.0.3
+Added Opentag container
 
 ###0.0.2
 Bugfix on `product` price.
