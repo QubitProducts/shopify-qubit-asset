@@ -1,6 +1,10 @@
 shopify-universal-variable-asset
 ================================
 
+Universal Variable provides a standardised JSON structure for data relating to the user journey of your visitors, such user details, products viewed and transactions. Data contained in Universal Variable are pushed automatically to Qubit’s platform and Opentag scripts.
+
+The code in this repository will take away 95% of the development work of implementing Universal Variable on your Shopify store.
+
 #Overview
 
 When implementing [Universal Variable](http://tools.qubitproducts.com/uv) and [Opentag](http://www.qubitproducts.com/tag-management), you need to do two things from a technical perspective:
