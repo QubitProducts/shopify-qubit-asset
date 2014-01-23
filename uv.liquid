@@ -18,6 +18,14 @@
     // http://docs.shopify.com/api/product
     var product = {{ product | json }};
 
+    // http://docs.shopify.com/themes/liquid-variables/customer
+    var user = {
+      name: "{{ customer.name }}",
+      user_id: "{{ customer.id }}",
+      email: "{{ customer.email }}"
+      // TODO: has_transacted
+    };
+
     // http://docs.shopify.com/themes/liquid-variables/cart
     var basket = {{ cart | json }};
     var basketProducts = [];
@@ -234,6 +242,14 @@
       });
     };
 
+
+  /*
+   * User
+   */
+
+    if (user) {
+      uv.user = user;  
+    }
 
   /*
    * Events
