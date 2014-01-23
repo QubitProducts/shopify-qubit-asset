@@ -1,0 +1,64 @@
+(function () {
+
+  var uv = window.universal_variable = window.universal_variable || {};
+
+
+  /*
+   * Liquid variable setting
+   * Take a bunch of the shopify variables and pass them into local JS variables
+   * to enable the mapping to Universal Variable.
+   */
+
+    // http://docs.shopify.com/api/page
+    // var page = {{ page | json }};
+
+    // http://docs.shopify.com/api/product
+    var product = {{ product | json }};
+
+
+  /*
+   * Product
+   */
+
+    uv.product = {
+
+      id: product.id,
+
+      // path is not attached to the shopify product, pass back as the pathname
+      url: window.location.pathname,
+
+
+      name: product.title,
+      description: product.description,
+      manufacturer: product.vendor,
+      category: product.type,
+
+      // Custom: take the first tag applied, as shopify does not support subcategories
+      // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
+      // e.g. subsubcategory, subsubsubcategory
+      subcategory: product.tags[0], 
+      currency: "GBP",
+      unit_price: product.price,
+      unit_sale_price: product.price_min,
+
+      // Take the sku_code from the first variant
+      sku_code: product.variants[0].sku,
+
+      // The stock on the product page. Take the quantity of the first variant.
+      stock: product.variants[0].inventory_quantity,
+
+      // Shopify doesn't have a voucher on the product level
+      // voucher: "MYVOUCHER1",
+
+      // TODO: determine a way of incorporating color and size
+      // color: "Red",
+      // size: "M"
+
+      // TODO: add custom variable for images
+
+    };
+
+
+
+}());
+
