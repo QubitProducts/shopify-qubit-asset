@@ -48,5 +48,8 @@ Copy the code from `uv-transaction.liquid` in this repository, and paste it into
 
 #Changelog
 
+###0.0.2
+Bugfix on `product` price.
+
 ###0.0.1 
 Initial release
