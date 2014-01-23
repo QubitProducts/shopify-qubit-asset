@@ -1,0 +1,125 @@
+<!-- Qubit Universal Variable -->
+<script>
+(function () {
+
+  var uv = window.universal_variable = window.universal_variable || {};
+
+  /*
+   * Liquid variable setting
+   * Take a bunch of the shopify variables and pass them into local JS variables
+   * to enable the mapping to Universal Variable.
+   */
+
+    // http://docs.shopify.com/themes/liquid-variables/customer
+    var user = {
+      name: "{{ customer.name }}",
+      user_id: "{{ customer.id }}",
+      email: "{{ customer.email }}"
+    };
+
+  /*
+   * Page
+   */
+
+    uv.page = {
+      type: "Confirmation"
+    };
+
+
+  /*
+   * Transaction
+   */
+
+    uv.transaction = {
+      order_id: "{{ order_number }}",
+      currency: "{{ shop.currency }}",
+      subtotal: {{ subtotal_price | money_without_currency }},
+      subtotal_include_tax: true,
+      tax: {{ tax_price | money_without_currency }},
+      shipping_cost: {{ shipping_price | money_without_currency }},
+      total: {{ total_price | money_without_currency }},
+      line_items: []
+    };
+
+    // Add voucher discounts if one has been used
+    {% for discount in discounts %}
+      uv.transaction.voucher = "{{ discount.code }}";
+      uv.transaction.voucher_discount = "{{ discount.savings }}";
+    {% endfor %}
+
+    // Get the first shipping method
+    {% for shipping_method in shipping_methods %}
+      uv.transaction.shipping_method = "{{ shipping_method.title }}";
+    {% endfor %}
+
+    // Add the line items
+    {% for item in line_items %} 
+      var item = {{ item | json }};
+
+      // build out the product object
+      var product = {{ item.product | json }};
+      var uvProduct = {
+
+        id: String(product.id),
+
+        sku_code: item.sku,
+
+        name: product.title,
+        description: product.description,
+        manufacturer: product.vendor,
+        category: product.type,
+
+        // Custom: take the first tag applied, as shopify does not support subcategories
+        // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
+        // e.g. subsubcategory, subsubsubcategory
+        subcategory: product.tags[0], 
+        currency: "GBP",
+        unit_price: product.price / 100,
+        unit_sale_price: product.price_min / 100,
+
+        // Take the sku_code from the first variant
+        sku_code: product.variants[0].sku
+
+        // Shopify doesn't have a voucher on the product level
+        // voucher: "MYVOUCHER1",
+
+        // TODO: determine a way of incorporating color and size
+        // most likely it'll be handled through the `properties` key
+        // color: "Red",
+        // size: "M"
+
+      }
+
+      uv.transaction.line_items.push({
+        product: uvProduct,
+        quantity: item.quantity,
+        subtotal: item.line_price
+      });
+    {% endfor %}
+
+
+  /*
+   * User
+   */
+
+    if (user) {
+      uv.user = user;  
+    }
+
+  /*
+   * Events
+   */
+
+    uv.events = [];
+
+
+  /*
+   * Version
+   */
+
+    uv.version = "1.2.0";
+
+
+}());
+</script>
+<!-- Qubit Universal Variable end -->
