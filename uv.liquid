@@ -1,0 +1,253 @@
+<!-- Qubit Universal Variable -->
+<script>
+(function () {
+
+  var uv = window.universal_variable = window.universal_variable || {};
+
+
+  /*
+   * Liquid variable setting
+   * Take a bunch of the shopify variables and pass them into local JS variables
+   * to enable the mapping to Universal Variable.
+   */
+
+    // http://docs.shopify.com/themes/liquid-variables/global
+    var template = "{{ template }}";
+    var pageTitle = "{{ page_title }}";
+
+    // http://docs.shopify.com/api/product
+    var product = {{ product | json }};
+
+    // http://docs.shopify.com/themes/liquid-variables/cart
+    var basket = {{ cart | json }};
+    var basketProducts = [];
+    {% for item in cart.items %} 
+      basketProducts.push({{ item.product | json }}); 
+    {% endfor %}
+
+    // http://docs.shopify.com/themes/liquid-variables/collection
+    var collection = {{ collection | json }};
+    var collectionItems = {{ collection.products | json }};
+
+    // http://docs.shopify.com/themes/liquid-variables/search
+    var searchQuery = "{{ search.terms }}";
+    var searchResults = {{ search.results | json }};
+
+
+  /*
+   * Generic functions
+   * Useful for parsing shopify data into a UV-compitable format, among other things.
+   */
+
+    // Get the page category
+    var getPageCategory = function () {
+      switch (template) {
+        case "index": 
+          return "Home";
+          break;
+        case "page":
+          return "Content";
+          break;
+        case "article":
+          return "Blog";
+          break;
+        case "product":
+          return "Product";
+          break;
+        case "search":
+          return "Search";
+          break;
+        case "collection": 
+          return "Category";
+          break;
+        case "cart":
+          return "Basket";
+          break;
+
+        // Handle other templates, although 
+        default: 
+          return template;
+      }
+    };
+
+    // Take a `product` (http://docs.shopify.com/api/product) Shopify 
+    // object and return a mapped uv product object
+    var getUvProduct = function (product) {
+
+      var uvProduct = {
+
+        id: String(product.id),
+
+        // path is not attached to the shopify product, pass back as the pathname
+        url: window.location.pathname,
+
+
+        name: product.title,
+        description: product.description,
+        manufacturer: product.vendor,
+        category: product.type,
+
+        // Custom: take the first tag applied, as shopify does not support subcategories
+        // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
+        // e.g. subsubcategory, subsubsubcategory
+        subcategory: product.tags[0], 
+        currency: "GBP",
+        unit_price: product.price,
+        unit_sale_price: product.price_min,
+
+        // Take the sku_code from the first variant
+        sku_code: product.variants[0].sku,
+
+        // The stock on the product page. Take the quantity of the first variant.
+        stock: product.variants[0].inventory_quantity,
+
+        // Shopify doesn't have a voucher on the product level
+        // voucher: "MYVOUCHER1",
+
+        // TODO: determine a way of incorporating color and size
+        // most likely it'll be handled through the `properties` key
+        // color: "Red",
+        // size: "M"
+
+        // TODO: add custom variable for images
+
+      }
+
+      return uvProduct;
+    };
+
+
+  /*
+   * Page
+   */
+
+   
+
+    uv.page = {
+
+      type: getPageCategory(),
+
+      breadcrumb: function () {
+        var category = getPageCategory();
+        if (category === "Product") {
+          return [ product.type ];
+        } else if (category === "Category" && collection) {
+          return [ collection.title ];
+        }
+      }()
+
+     };
+
+
+  /*
+   * Product
+   */
+
+    if (product) {
+      uv.product = getUvProduct(product);
+    };
+
+
+  /*
+   * Listing - collection pages
+   */
+
+    if (collection) {
+      uv.listing = {
+       items: []
+      };
+
+      // Add the items from the collection.products
+      for (var i = 0; i < collectionItems.length; i++) {
+        var item = collectionItems[i];
+        uv.listing.items.push(getUvProduct(item));
+      };
+    }
+
+  /*
+   * Listing - search pages
+   */
+
+    if (searchQuery) {
+      uv.listing = {
+        items: [],
+        query: searchQuery
+      };
+
+      for (var i = 0; i < searchResults.length; i++) {
+        var item = searchResults[i];
+        // check it's a product (blog posts and pages can come up)
+        if (typeof item.price !== "undefined") {
+          uv.listing.items.push(getUvProduct(item));  
+        }
+      };
+    }
+
+ 
+  /*
+   * Basket
+   */
+
+    uv.basket =  {
+      id: basket.token,
+
+      // TODO
+      // currency: GBP,
+
+      subtotal: basket.total_price,
+
+      // TODO
+      // subtotal_include_tax: true,
+      // voucher: MYVOUCHER1,
+      // voucher_discount: 15,
+      // tax: 5,
+      // shipping_cost: 4.5,
+      // shipping_method: Royal Mail 1st Class,
+
+      // TODO: Check if this should be identical to subtotal
+      // ideally we'll add shipping and tax
+      total: basket.total_price,
+
+      // The items purcahased
+      line_items: []
+    };
+
+    // Add items to the line_items array. See 
+    // http://docs.shopify.com/themes/liquid-variables/line_item for reference.
+    // Note that the below does not create an exhaustive `product` UV parameter,
+    // it just takes the variables from within the Shopify line_item object and 
+    // passes them to the UV.
+    for (var i = 0; i < basket.items.length; i++) {
+      var item = basket.items[i];
+      var product = basketProducts[i];
+
+      // parse the product variable to get the majority of variables. The only 
+      // ones we need left are the url, sku, price, url, quantity
+      var uvProduct = getUvProduct(product);
+      uvProduct.sku_code = item.sku;
+      uvProduct.url = item.url;
+
+      uv.basket.line_items.push({
+        product: uvProduct,
+        quantity: item.quantity,
+        subtotal: item.line_price
+      });
+    };
+
+
+  /*
+   * Events
+   */
+
+    uv.events = [];
+
+
+  /*
+   * Version
+   */
+
+    uv.version = "1.2.0";
+
+
+}());
+</script>
