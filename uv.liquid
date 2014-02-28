@@ -14,6 +14,7 @@
     // http://docs.shopify.com/themes/liquid-variables/global
     var template = "{{ template }}";
     var pageTitle = "{{ page_title }}";
+    var shopCurrency = "{{ shop.currency }}";
 
     // http://docs.shopify.com/api/product
     var product = {{ product | json }};
@@ -87,6 +88,7 @@
         id: String(product.id),
 
         // path is not attached to the shopify product, pass back as the pathname
+        // Consider using: {{ product.url }}
         url: window.location.pathname,
 
 
@@ -99,7 +101,7 @@
         // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
         // e.g. subsubcategory, subsubsubcategory
         subcategory: product.tags[0], 
-        currency: "GBP",
+        currency: shopCurrency,
         unit_price: product.price / 100,
         unit_sale_price: product.price_min / 100,
 
@@ -199,8 +201,7 @@
     uv.basket =  {
       id: basket.token,
 
-      // TODO
-      // currency: GBP,
+      currency: shopCurrency,
 
       subtotal: basket.total_price,
 
