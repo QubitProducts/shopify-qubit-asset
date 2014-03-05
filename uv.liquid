@@ -14,32 +14,9 @@
     // http://docs.shopify.com/themes/liquid-variables/global
     var template = "{{ template }}";
     var pageTitle = "{{ page_title }}";
-
-    // http://docs.shopify.com/api/product
-    var product = {{ product | json }};
-
-    // http://docs.shopify.com/themes/liquid-variables/customer
-    var user = {
-      name: "{{ customer.name }}",
-      user_id: "{{ customer.id }}",
-      email: "{{ customer.email }}"
-      // TODO: has_transacted
-    };
-
-    // http://docs.shopify.com/themes/liquid-variables/cart
-    var basket = {{ cart | json }};
-    var basketProducts = [];
-    {% for item in cart.items %} 
-      basketProducts.push({{ item.product | json }}); 
-    {% endfor %}
-
-    // http://docs.shopify.com/themes/liquid-variables/collection
-    var collection = {{ collection | json }};
-    var collectionItems = {{ collection.products | json }};
-
-    // http://docs.shopify.com/themes/liquid-variables/search
-    var searchQuery = "{{ search.terms }}";
-    var searchResults = {{ search.results | json }};
+    
+    //var collection = {{ collection | json }};
+  //var collectionItems = {{ collection.products | json }};
 
 
   /*
@@ -78,57 +55,10 @@
       }
     };
 
-    // Take a `product` (http://docs.shopify.com/api/product) Shopify 
-    // object and return a mapped uv product object
-    var getUvProduct = function (product) {
-
-      var uvProduct = {
-
-        id: String(product.id),
-
-        // path is not attached to the shopify product, pass back as the pathname
-        url: window.location.pathname,
-
-
-        name: product.title,
-        description: product.description,
-        manufacturer: product.vendor,
-        category: product.type,
-
-        // Custom: take the first tag applied, as shopify does not support subcategories
-        // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
-        // e.g. subsubcategory, subsubsubcategory
-        subcategory: product.tags[0], 
-        currency: "GBP",
-        unit_price: product.price / 100,
-        unit_sale_price: product.price_min / 100,
-
-        // Take the sku_code from the first variant
-        sku_code: product.variants[0].sku,
-
-        // The stock on the product page. Take the quantity of the first variant.
-        stock: product.variants[0].inventory_quantity,
-
-        // Shopify doesn't have a voucher on the product level
-        // voucher: "MYVOUCHER1",
-
-        // TODO: determine a way of incorporating color and size
-        // most likely it'll be handled through the `properties` key
-        // color: "Red",
-        // size: "M"
-
-        // TODO: add custom variable for images
-
-      }
-
-      return uvProduct;
-    };
-
-
+     
   /*
    * Page
    */
-
    
 
     uv.page = {
@@ -138,9 +68,11 @@
       breadcrumb: function () {
         var category = getPageCategory();
         if (category === "Product") {
-          return [ product.type ];
-        } else if (category === "Category" && collection) {
-          return [ collection.title ];
+          return [ "{{ product.type }}" ];
+        } else if (category === "Category") {
+          return [ "{{ collection.title }}" ];
+        } else if (category === "Content") {
+          return [ pageTitle ];
         }
       }()
 
@@ -150,59 +82,100 @@
   /*
    * Product
    */
-
-    if (product) {
-      uv.product = getUvProduct(product);
-    };
+     
+    // http://docs.shopify.com/api/product
+     {% if product %}
+      uv.product = {
+        id: "{{ product.id }}",
+        url: "/products/{{ product.handle }}",
+        name: "{{ product.title }}",
+        description: "{{ product.description | strip_html | truncate: 100 }}",
+        manufacturer: "{{ product.vendor }}",
+        category: "{{ product.type }}",
+        subcategory: "{{ product.tags.first }}", 
+        currency: "{{ shop.currency }}",
+        unit_price: {{ product.price | divided_by: 100 }},
+        unit_sale_price: {{ product.price_min | divided_by: 100 }},
+        sku_code: "{{ product.variants.first.sku }}",
+        stock: {{ product.variants.first.inventory_quantity }}
+      };
+    {% endif %}
 
 
   /*
    * Listing - collection pages
    */
 
-    if (collection) {
+    // http://docs.shopify.com/themes/liquid-variables/collection
+    {% if collection %}
       uv.listing = {
        items: []
       };
-
-      // Add the items from the collection.products
-      for (var i = 0; i < collectionItems.length; i++) {
-        var item = collectionItems[i];
-        uv.listing.items.push(getUvProduct(item));
-      };
-    }
+      
+      {% for product in collection.products %} 
+        uv.listing.items.push({
+          id: "{{ product.id }}",
+          url: "/products/{{ product.handle }}",
+          name: "{{ product.title }}",
+          description: "{{ product.description | strip_html | truncate: 100 }}",
+          manufacturer: "{{ product.vendor }}",
+          category: "{{ product.type }}",
+          subcategory: "{{ product.tags.first }}", 
+          currency: "{{ shop.currency }}",
+          unit_price: {{ product.price | divided_by: 100 }},
+          unit_sale_price: {{ product.price_min | divided_by: 100 }},
+          sku_code: "{{ product.variants.first.sku }}",
+          stock: {{ product.variants.first.inventory_quantity }}                    
+        });
+      {% endfor %}
+    {% endif %}
 
   /*
    * Listing - search pages
    */
 
-    if (searchQuery) {
+    // http://docs.shopify.com/themes/liquid-variables/search
+    {% if search.terms %}
+       
       uv.listing = {
         items: [],
-        query: searchQuery
-      };
-
-      for (var i = 0; i < searchResults.length; i++) {
-        var item = searchResults[i];
-        // check it's a product (blog posts and pages can come up)
-        if (typeof item.price !== "undefined") {
-          uv.listing.items.push(getUvProduct(item));  
-        }
-      };
-    }
+        query: "{{ search.terms }}"
+      };                       
+                              
+      {% for product in search.results %} 
+        uv.listing.items.push({
+          id: "{{ product.id }}",
+          url: "/products/{{ product.handle }}",
+          name: "{{ product.title }}",
+          description: "{{ product.description | strip_html | truncate: 100 }}",
+          manufacturer: "{{ product.vendor }}",
+          category: "{{ product.type }}",
+          subcategory: "{{ product.tags.first }}", 
+          currency: "{{ shop.currency }}",
+          unit_price: {{ product.price | divided_by: 100 }},
+          unit_sale_price: {{ product.price_min | divided_by: 100 }},
+          sku_code: "{{ product.variants.first.sku }}",
+          stock: {{ product.variants.first.inventory_quantity }}
+        });
+      {% endfor %}
+        
+    {% endif %}
 
  
   /*
    * Basket
    */
+    
+    
+    // http://docs.shopify.com/themes/liquid-variables/cart
+    var basketProducts = [];
+
 
     uv.basket =  {
-      id: basket.token,
 
-      // TODO
-      // currency: GBP,
+      currency: "{{ shop.currency }}",
 
-      subtotal: basket.total_price,
+      subtotal: {{ cart.total_price }},
 
       // TODO
       // subtotal_include_tax: true,
@@ -214,42 +187,57 @@
 
       // TODO: Check if this should be identical to subtotal
       // ideally we'll add shipping and tax
-      total: basket.total_price,
+      total: {{ cart.total_price }},
 
       // The items purcahased
       line_items: []
     };
+     
+     
 
     // Add items to the line_items array. See 
     // http://docs.shopify.com/themes/liquid-variables/line_item for reference.
     // Note that the below does not create an exhaustive `product` UV parameter,
     // it just takes the variables from within the Shopify line_item object and 
     // passes them to the UV.
-    for (var i = 0; i < basket.items.length; i++) {
-      var item = basket.items[i];
-      var product = basketProducts[i];
-
-      // parse the product variable to get the majority of variables. The only 
-      // ones we need left are the url, sku, price, url, quantity
-      var uvProduct = getUvProduct(product);
-      uvProduct.sku_code = item.sku;
-      uvProduct.url = item.url;
-
+       
+     {% for item in cart.items %} 
       uv.basket.line_items.push({
-        product: uvProduct,
-        quantity: item.quantity,
-        subtotal: item.line_price / 100
-      });
-    };
+          product: {
+        id: "{{ item.product.id }}",
+            url: "/products/{{ item.product.handle }}",
+            name: "{{ item.product.title }}",
+            description: "{{ product.description | strip_html | truncate: 100 }}",
+            manufacturer: "{{ item.product.vendor }}",
+            category: "{{ item.product.type }}",
+            subcategory: "{{ item.product.tags.first }}", 
+            currency: "{{ shop.currency }}",
+            unit_price: {{ item.product.price | divided_by: 100 }},
+            unit_sale_price: {{ item.product.price_min | divided_by: 100 }},
+            sku_code: "{{ item.product.variants.first.sku }}",
+            stock: {{ item.product.variants.first.inventory_quantity }}  
+          },
+          subtotal: {{ item.line_price }},
+          quantity: {{ item.quantity }}
+      }); 
+    {% endfor %}
+
 
 
   /*
    * User
    */
 
-    if (user) {
-      uv.user = user;  
-    }
+     
+    // http://docs.shopify.com/themes/liquid-variables/customer
+    // TODO: has_transacted
+    {% if customer %} 
+      uv.user = {
+        name: "{{ customer.name }}",
+        user_id: "{{ customer.id }}",
+        email: "{{ customer.email }}"
+      };  
+    {% endif %}
 
   /*
    * Events
@@ -268,7 +256,3 @@
 }());
 </script>
 <!-- Qubit Universal Variable end -->
-
-<!-- Opentag container REPLACE XXXX-XXXX with your own id -->
-<script src='//d3c3cq33003psk.cloudfront.net/opentag-XXXX-XXXX.js' async defer></script>
-<!-- Opentag container end -->
