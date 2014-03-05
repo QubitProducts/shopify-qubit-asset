@@ -54,31 +54,29 @@
 
     // Add the line items
     {% for item in line_items %} 
-      var item = {{ item | json }};
 
       // build out the product object
-      var product = {{ item.product | json }};
       var uvProduct = {
 
-        id: String(product.id),
+        id: "{{ item.product.id }}",
 
-        sku_code: item.sku,
+        name: "{{ item.product.title }}",
+        description: "{{ item.product.description | strip_html | truncate: 100 }}",
+        manufacturer: "{{ item.product.vendor }}",
+        category: "{{ item.product.type }}",
 
-        name: product.title,
-        description: product.description,
-        manufacturer: product.vendor,
-        category: product.type,
+        url: "/products/{{ item.product.handle }}",
 
         // Custom: take the first tag applied, as shopify does not support subcategories
         // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
         // e.g. subsubcategory, subsubsubcategory
-        subcategory: product.tags[0], 
-        currency: "GBP",
-        unit_price: product.price / 100,
-        unit_sale_price: product.price_min / 100,
+        subcategory: "{{ item.product.tags[0] }}",  
+        currency: "{{ shop.currency }}",
+        unit_price: {{ item.product.price | divided_by: 100 }},
+        unit_sale_price: {{ item.product.price_min | divided_by: 100 }},
 
         // Take the sku_code from the first variant
-        sku_code: product.variants[0].sku
+        sku_code: "{{ item.product.variants.first.sku }}"
 
         // Shopify doesn't have a voucher on the product level
         // voucher: "MYVOUCHER1",
@@ -92,8 +90,8 @@
 
       uv.transaction.line_items.push({
         product: uvProduct,
-        quantity: item.quantity,
-        subtotal: item.line_price
+        quantity: {{ item.quantity }},
+        subtotal: {{ item.line_price | divided_by: 100 }}
       });
     {% endfor %}
 

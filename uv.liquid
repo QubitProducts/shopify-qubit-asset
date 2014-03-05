@@ -217,7 +217,7 @@
             sku_code: "{{ item.product.variants.first.sku }}",
             stock: {{ item.product.variants.first.inventory_quantity }}  
           },
-          subtotal: {{ item.line_price }},
+          subtotal: {{ item.line_price | divided_by: 100 }},
           quantity: {{ item.quantity }}
       }); 
     {% endfor %}
