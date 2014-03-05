@@ -53,6 +53,9 @@ Copy the code from `uv-transaction.liquid` in this repository, and paste it into
 
 #Changelog
 
+###0.0.4
+No longer using the `| json` filter in liquid templates - populating the variables directly
+
 ###0.0.3
 Added Opentag container
 
