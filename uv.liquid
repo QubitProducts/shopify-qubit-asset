@@ -105,6 +105,7 @@
 
     // http://docs.shopify.com/themes/liquid-variables/collection
     {% if collection %}
+    {% unless template contains 'product' %}
       uv.listing = {
        items: []
       };
@@ -125,6 +126,7 @@
           stock: {{ product.variants.first.inventory_quantity }}                    
         });
       {% endfor %}
+    {% endunless %}
     {% endif %}
 
   /*
