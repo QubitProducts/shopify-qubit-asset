@@ -28,10 +28,10 @@ Update the Opentag container at the bottom of `uv.liquid` and `uv-transaction.li
 
 To install the bulk of the Universal Variable code, copy the `uv.liquid` file from this repository to the `Snippets/` directory, found at "Themes > Template Editor > Snippets".
 
-Then at the bottom of the `<head>` in `theme.liquid` in the `Layouts/` directory, add the following code: 
+Then at the bottom of the `<head>` in `theme.liquid` in the `Layouts/` directory, add the following code:
 
 ```liquid
-{% include 'universal-variable' %}
+{% include 'uv' %}
 ```
 
 
@@ -59,5 +59,5 @@ Added Opentag container
 ###0.0.2
 Bugfix on `product` price.
 
-###0.0.1 
+###0.0.1
 Initial release
