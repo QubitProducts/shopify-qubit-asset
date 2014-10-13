@@ -12,9 +12,9 @@
 
     // http://docs.shopify.com/themes/liquid-variables/customer
     var user = {
-      name: "{{ customer.name }}",
-      user_id: "{{ customer.id }}",
-      email: "{{ customer.email }}"
+      name: {{ customer.name | json }},
+      user_id: {{ customer.id | json }},
+      email: {{ customer.email | json }}
     };
 
   /*
@@ -31,7 +31,7 @@
    */
 
     uv.transaction = {
-      order_id: "{{ order_number }}",
+      order_id: {{ order_number | json }},
       currency: "{{ shop.currency }}",
       subtotal: {{ subtotal_price | money_without_currency }},
       subtotal_include_tax: true,
@@ -43,40 +43,40 @@
 
     // Add voucher discounts if one has been used
     {% for discount in discounts %}
-      uv.transaction.voucher = "{{ discount.code }}";
-      uv.transaction.voucher_discount = "{{ discount.savings }}";
+      uv.transaction.voucher = {{ discount.code | json }};
+      uv.transaction.voucher_discount = {{ discount.savings | json }};
     {% endfor %}
 
     // Get the first shipping method
     {% for shipping_method in shipping_methods %}
-      uv.transaction.shipping_method = "{{ shipping_method.title }}";
+      uv.transaction.shipping_method = {{ shipping_method.title | json }};
     {% endfor %}
 
     // Add the line items
-    {% for item in line_items %} 
+    {% for item in line_items %}
 
       // build out the product object
       var uvProduct = {
 
-        id: "{{ item.product.id }}",
+        id: {{ item.product.id | json }},
 
-        name: "{{ item.product.title }}",
-        description: "{{ item.product.description | strip_html | truncate: 100 }}",
-        manufacturer: "{{ item.product.vendor }}",
-        category: "{{ item.product.type }}",
+        name: {{ item.product.title | json }},
+        description: {{ item.product.description | strip_html | truncate: 100 | json }},
+        manufacturer: {{ item.product.vendor | json }},
+        category: {{ item.product.type |json }},
 
         url: "/products/{{ item.product.handle }}",
 
         // Custom: take the first tag applied, as shopify does not support subcategories
-        // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level 
+        // TOOD: loop through the tags[] array and add them as key value pairs on a deeper level
         // e.g. subsubcategory, subsubsubcategory
-        subcategory: "{{ item.product.tags[0] }}",  
+        subcategory: {{ item.product.tags[0] |json }},
         currency: "{{ shop.currency }}",
         unit_price: {{ item.product.price | divided_by: 100 }},
         unit_sale_price: {{ item.product.price_min | divided_by: 100 }},
 
         // Take the sku_code from the first variant
-        sku_code: "{{ item.product.variants.first.sku }}"
+        sku_code: {{ item.product.variants.first.sku | json }}
 
         // Shopify doesn't have a voucher on the product level
         // voucher: "MYVOUCHER1",
@@ -101,7 +101,7 @@
    */
 
     if (user) {
-      uv.user = user;  
+      uv.user = user;
     }
 
   /*
