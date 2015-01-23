@@ -31,7 +31,7 @@
    */
 
     uv.transaction = {
-      order_id: "{{ order_number }}",
+      order_id: "{{ id }}",
       currency: "{{ shop.currency }}",
       subtotal: {{ subtotal_price | money_without_currency }},
       subtotal_include_tax: true,
