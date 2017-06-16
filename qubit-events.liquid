@@ -72,7 +72,7 @@
         value: {{ product.price | divided_by: 100 }}
       },
       url: "{{ product.url }}",
-      description: {{ product.description | strip_html | truncate: 100 | json }},
+      description: {{ product.description | strip_html | truncate: 2048 | json }},
       category: ["{{ product.type}}"],
       images: {{ product.images | json }}
     }
@@ -99,7 +99,7 @@
         	value: {{ product.price | divided_by: 100 }}
      	 },
       	url: "{{ product.url }}",
-     	description: {{ product.description | strip_html | truncate: 100 | json }},
+     	description: {{ product.description | strip_html | truncate: 2048 | json }},
       	category: ["{{ product.type}}"],
       	images: {{ product.images | json }}
       }
@@ -126,7 +126,7 @@
         	value: {{ product.price | divided_by: 100 }}
      	 },
 	    url: "{{ product.url }}",
-     	description: {{ product.description | strip_html | truncate: 100 | json }},
+     	description: {{ product.description | strip_html | truncate: 2048 | json }},
       	category: ["{{ product.type}}"],
       	images: {{ product.images | json }}
       }
@@ -167,7 +167,7 @@
           value: {{ item.original_line_price | divided_by: 100 }}
         }, 
         url: "{{ item.url }}",
-        description: {{ item.product.description | strip_html | truncate: 100 | json }},
+        description: {{ item.product.description | strip_html | truncate: 2048 | json }},
         category: [{{ item.product.type | json}}],
         images: [{{ item.image | json }}]
       }, 
