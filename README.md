@@ -36,11 +36,11 @@ If your products have multiple variants (size, color etc) then an additional pro
   uv.emit('ecProduct', {
     eventType: 'detail',
     product: {
-      sku: {{ product.variants.first.sku | default: product.variants.first.id | json }},
-      productId: "{{ product.id }}",
+      sku: {{ product.sku | default: product.variant_id | json }},
+      productId: "{{ product.product_id }}",
       name: {{ product.title | json }},
       manufacturer: {{ product.vendor | json}},
-      stock: {{ product.variants.first.inventory_quantity }},
+      stock: {{ product.inventory_quantity }},
       price: {
         currency: "{{ shop.currency }}",
         value: {{ product.price | divided_by: 100 }}
@@ -52,6 +52,8 @@ If your products have multiple variants (size, color etc) then an additional pro
     }
   })
 ```
+Liquid variables are included and assume product is the object of the new variant.
+
 Note: If you have been given a namespace prefix for your property, prefix it to 'ecProduct'.
 
 ##Confirmation page
