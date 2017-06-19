@@ -29,7 +29,30 @@ Then at the bottom of the `<head>` in `theme.liquid` in the `Layouts/` directory
 ```liquid
 {% include 'qubit-events' %}
 ```
+##Product Variations
 
+If your products have multiple variants (size, color etc) then an additional produce event needs to be emitted when the variant is changed. Due to the way Shopify themes work, it is not possible to template this as each theme can override the switcher. Insert the following event code into the function which handles the variant change:
+```
+  uv.emit('ecProduct', {
+    eventType: 'detail',
+    product: {
+      sku: {{ product.variants.first.sku | default: product.variants.first.id | json }},
+      productId: "{{ product.id }}",
+      name: {{ product.title | json }},
+      manufacturer: {{ product.vendor | json}},
+      stock: {{ product.variants.first.inventory_quantity }},
+      price: {
+        currency: "{{ shop.currency }}",
+        value: {{ product.price | divided_by: 100 }}
+      },
+      url: "{{ product.url }}",
+      description: {{ product.description | strip_html | truncate: 2048 | json }},
+      categories: ["{{ product.type}}"],
+      images: {{ product.images | json }}
+    }
+  })
+```
+Note: If you have been given a namespace prefix for your property, prefix it to 'ecProduct'.
 
 ##Confirmation page
 
