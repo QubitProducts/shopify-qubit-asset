@@ -2,7 +2,7 @@ Qubit Event Templates
 ====================================
 The code in this repository will take away 95% of the development work required in implementing Qubit on your Shopify store.
 
-#Overview
+# Overview
 
 When implementing Qubit, you need to do two things from a technical perspective:
 
@@ -14,13 +14,13 @@ The code in this repository handles both of these for you via using Shopify temp
 __Note__: This repository is not a Shopify App as such, it provides a series of sample logic that can be copied across to your [Shopify templates](http://docs.shopify.com/themes).
 
 
-#Installation
+# Installation
 
-##Smartserve Script
+## Smartserve Script
 
 Update the Smartserve file at the top of `qubit-events.liquid` and `qubit-events-transaction.liquid` with your own unique id.
 
-##Sitewide
+## Sitewide
 
 To install, copy the `qubit-events.liquid` file from this repository to the `Snippets/` directory, found at "Themes > Template Editor > Snippets".
 
@@ -29,7 +29,7 @@ Then at the bottom of the `<head>` in `theme.liquid` in the `Layouts/` directory
 ```liquid
 {% include 'qubit-events' %}
 ```
-##Product Variations
+## Product Variations
 
 If your products have multiple variants (size, color etc) then an additional produce event needs to be emitted when the variant is changed. Due to the way Shopify themes work, it is not possible to template this as each theme can override the switcher. Insert the following event code into the function which handles the variant change:
 ```
@@ -56,7 +56,7 @@ Liquid variables are included and assume product is the object of the new varian
 
 Note: If you have been given a namespace prefix for your property, prefix it to 'ecProduct'.
 
-##Confirmation page
+## Confirmation page
 
 The Shopify template system does now allow codes to be added to the confirmation page (after a purchase has been made), but it does provide separate functionality to what's required.
 
@@ -64,7 +64,7 @@ Copy the code from `qubit-events-transaction.liquid` in this repository, and pas
 
 
 
-#Useful notes
+# Useful notes
 
 * There are a lot of inline JavaScript comments within the templates. If you do not want these to be publicly accessible, we recommend removing them.
 * This code in this repository handles the vast majority of the implementation. However if you're looking to do something more custom, additioanl coding may be required.
@@ -72,16 +72,16 @@ Copy the code from `qubit-events-transaction.liquid` in this repository, and pas
 
 
 
-#Changelog
+# Changelog
 
-###2.0.0
+### 2.0.0
 Converted to Qubit event format
 
-###0.0.3
+### 0.0.3
 Added Opentag container
 
-###0.0.2
+### 0.0.2
 Bugfix on `product` price.
 
-###0.0.1
+### 0.0.1
 Initial release
