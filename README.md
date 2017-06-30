@@ -62,6 +62,7 @@ The Shopify template system does now allow codes to be added to the confirmation
 
 Copy the code from `qubit-events-transaction.liquid` in this repository, and paste it into the textbox found at: "Settings > Checkout > Additional content & scripts".
 
+Do not forget to update the Smartserve file name at the top of `qubit-events-transaction.liquid` with your own unique id.
 
 
 # Useful notes
