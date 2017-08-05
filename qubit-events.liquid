@@ -7,7 +7,8 @@
 <script>
 (function () {
   var config = {
-    eventNamespace: false
+    eventNamespace: false,
+    template: {{ template | json }}
   }
 
   if(config.eventNamespace) {
@@ -15,9 +16,8 @@
   } else {
     config.ns=""
   }
-  config.template = {{ template | json }}
   
-  var getPageCategory = function () {
+  var getPageType = function () {
     switch (config.template) {
       case "index": 
         return "home";
@@ -26,7 +26,7 @@
         return "content";
         break;
       case "article":
-        return "blog";
+        return "content";
         break;
       case "product":
         return "product";
@@ -47,151 +47,142 @@
 
 
   {% comment %}
-	Page
+	  Page
   {% endcomment %}
-  uv.emit(config.ns+'ecView', {
-    type: getPageCategory()
+  uv.emit(config.ns + 'ecView', {
+    type: getPageType()
   })
 
-      
+
   {% comment %}
-	Product - http://docs.shopify.com/api/product
+	  User - https://help.shopify.com/themes/liquid/objects/customer
   {% endcomment %}
-      
-  {% if product %}
-  uv.emit(config.ns+'ecProduct', {
-    eventType: 'detail',
-    product: {
-      sku: {{ product.variants.first.sku | default: product.variants.first.id | json }},
-      productId: "{{ product.id }}",
-      name: {{ product.title | json }},
-      manufacturer: {{ product.vendor | json}},
-      stock: {{ product.variants.first.inventory_quantity }},
-      price: {
-        currency: "{{ shop.currency }}",
-        value: {{ product.price | divided_by: 100 }}
-      },
-      url: "{{ product.url }}",
-      description: {{ product.description | strip_html | truncate: 2048 | json }},
-      categories: ["{{ product.type}}"],
-      images: {{ product.images | json }}
-    }
-  })
-  {% endif %}
-
-
-  {% if collection %}
-  {% comment %}
-	Listing - collection pages - http://docs.shopify.com/themes/liquid-variables/collection
-  {% endcomment %}
-  {% for product in collection.products %} 
-  uv.emit(config.ns+'ecProduct', {
-    eventType: 'listing',
-    product: {
-      sku: {{ product.variants.first.sku | json }},
-      productId: "{{ product.id }}",
-      name: {{ product.title | json }},
-      stock: {{ product.variants.first.inventory_quantity }},
-	    manufacturer: {{ product.vendor | json}},
-      price: {
-      	currency: "{{ shop.currency }}",
-      	value: {{ product.price | divided_by: 100 }}
-   	  },
-    	url: "{{ product.url }}",
-   	  description: {{ product.description | strip_html | truncate: 2048 | json }},
-    	categories: ["{{ product.type}}"],
-    	images: {{ product.images | json }}
-    }
-  })
-  {% endfor %}
-  {% endif %}
-
-
-  {% if search.terms %}
-  {% comment %}
-	Listing - search pages - http://docs.shopify.com/themes/liquid-variables/search
-  {% endcomment %}
-  {% for product in search.results %} 
-  uv.emit(config.ns+'ecProduct', {
-    eventType: 'listing',
-    product: {
-      sku: {{ product.variants.first.sku | json }},
-      productId: "{{ product.id }}",
-      name: {{ product.title | json }},
-      stock: {{ product.variants.first.inventory_quantity }},
-	    manufacturer: {{ product.vendor | json}},
-      price: {
-      	currency: "{{ shop.currency }}",
-      	value: {{ product.price | divided_by: 100 }}
-   	  },
-	    url: "{{ product.url }}",
-     	description: {{ product.description | strip_html | truncate: 2048 | json }},
-    	categories: ["{{ product.type}}"],
-    	images: {{ product.images | json }}
-    }
-  })
-  {% endfor %}
-  {% endif %}
-
-
-  {% if cart.item_count %}
-  {% comment %}
-	Basket - http://docs.shopify.com/themes/liquid-variables/cart
-  {% endcomment %}
-  var basketSummary = {
-    subtotal: {
-      currency: '{{shop.currency}}',
-      value: {{ cart.total_price | divided_by: 100 }}
-    },
-    total: {
-      currency: '{{shop.currency}}',
-      value: {{ cart.total_price | divided_by: 100 }}
-    }
-  }
-  
-  {% for item in cart.items %} 
-    uv.emit('ecBasketItem', {
-      basket: basketSummary,
-      product: {
-        sku: "{{ item.sku | default: item.variant_id }}",
-        productId: "{{ item.product_id }}",
-        name: {{ item.title | json }},
-        manufacturer: {{ item.vendor | json}},
-        price: {
-          currency: "{{ shop.currency }}",
-          value: {{ item.price | divided_by: 100 }}
-        },
-        originalPrice:{
-          currency: "{{ shop.currency }}",
-          value: {{ item.original_line_price | divided_by: 100 }}
-        }, 
-        url: "{{ item.url }}",
-        description: {{ item.product.description | strip_html | truncate: 2048 | json }},
-        categories: [{{ item.product.type | json}}],
-        images: [{{ item.image | json }}]
-      }, 
-      quantity: {{ item.quantity }},
-      subtotal: {
-        currency: "{{ shop.currency }}",
-        value: {{ item.line_price | divided_by: 100 }}
+  {% if customer %}
+    uv.emit(config.ns + 'ecUser', {
+      user: {
+          id: "{{ customer.id | json }}",
+          email: {{ customer.email | json }},
+          firstName: {{ customer.first_name | json }},
+          lastName: {{ customer.last_name | json }}
       }
     })
+  {% endif %}
+
+  
+  {% comment %}
+	  Product - https://help.shopify.com/themes/liquid/objects/product
+  {% endcomment %} 
+  {% if product %}
+    uv.emit(config.ns + 'ecProduct', {
+      eventType: 'detail',
+      product: {
+        productId: "{{ product.id | json}}",
+        sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+        name: {{ product.title | json }},
+        manufacturer: {{ product.vendor | json }},
+        stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
+        price: {
+          currency: {{ shop.currency | json }},
+          value: {{ product.price | money_without_currency }}
+        },
+        url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
+        description: {{ product.description | strip_html | strip_newlines | truncate: 2048 | json }},
+        categories: ["{{ product.type}}"],
+        images: [ window.location.protocol + "{{ product | img_url: '400x' }}" ]
+      }
+    })
+  {% endif %}
+
+  {% comment %}
+    Listing - collection pages - https://help.shopify.com/themes/liquid/objects/collection
+  {% endcomment %}
+  {% if collection %}
+    {% for product in collection.products %} 
+      uv.emit(config.ns + 'ecProduct', {
+        eventType: 'listing',
+        product: {
+          productId: "{{ product.id | json}}",
+          sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+          name: {{ product.title | json }},
+          manufacturer: {{ product.vendor | json }},
+          stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
+          price: {
+            currency: {{ shop.currency | json }},
+            value: {{ product.price | money_without_currency }}
+          },
+          url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
+          categories: ["{{ product.type}}"]
+        }
+      })
     {% endfor %}
   {% endif %}
 
 
-  {% if customer %} 
   {% comment %}
-	User - http://docs.shopify.com/themes/liquid-variables/custome
+    Listing - search pages - https://help.shopify.com/themes/liquid/objects/search
   {% endcomment %}
-  uv.emit(config.ns+'ecUser', {
-    user: {
-      email: "{{ customer.email }}",
-      id: "{{ customer.id }}",
-      firstName: "{{ customer.first_name }}",
-      lastName: "{{ customer.last_name }}"
+  {% if search.terms %}
+    {% for product in search.results %} 
+      uv.emit(config.ns + 'ecProduct', {
+        eventType: 'listing',
+        product: {
+          productId: "{{ product.id | json}}",
+          sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+          name: {{ product.title | json }},
+          manufacturer: {{ product.vendor | json }},
+          stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
+          price: {
+            currency: {{ shop.currency | json }},
+            value: {{ product.price | money_without_currency }}
+          },
+          url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
+          categories: ["{{ product.type}}"]
+        }
+      })
+    {% endfor %}
+  {% endif %}
+
+  {% comment %}
+    Basket - https://help.shopify.com/themes/liquid/objects/cart
+  {% endcomment %}
+  {% if cart.item_count > 0 %}
+    var basketSummary = {
+      subtotal: {
+        currency: {{ shop.currency | json }},
+        value: {{ cart.total_price | money_without_currency }}
+      },
+      total: {
+        currency: {{ shop.currency | json }},
+        value: {{ cart.total_price | money_without_currency }}
+      }
     }
-  })
+
+    uv.emit('ecBasketSummary', {
+      basket: basketSummary
+    })
+
+    {% for item in cart.items %} 
+      uv.emit('ecBasketItem', {
+        basket: basketSummary,
+        product: {
+          productId: "{{ item.product.id | json}}",
+          sku: "{{ item.sku | default: item.variant_id | json }}",
+          name: {{ item.product.title | json }},
+          manufacturer: {{ item.product.vendor | json }},
+          price: {
+            currency: {{ shop.currency | json }},
+            value: {{ item.product.price | money_without_currency }}
+          },
+          url: window.location.protocol + "//" + window.location.hostname + "{{ item.product.url }}",
+          categories: ["{{ item.product.type}}"]
+        },
+        quantity: {{ item.quantity }},
+        subtotal: {
+          currency: {{ shop.currency | json }},
+          value: {{ item.line_price | money_without_currency }}
+        }
+      })
+    {% endfor %}
   {% endif %}
 
 }());

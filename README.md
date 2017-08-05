@@ -29,6 +29,7 @@ Then at the bottom of the `<head>` in `theme.liquid` in the `Layouts/` directory
 ```liquid
 {% include 'qubit-events' %}
 ```
+
 ## Product Variations
 
 If your products have multiple variants (size, color etc) then an additional produce event needs to be emitted when the variant is changed. Due to the way Shopify themes work, it is not possible to template this as each theme can override the switcher. Insert the following event code into the function which handles the variant change:
@@ -36,19 +37,19 @@ If your products have multiple variants (size, color etc) then an additional pro
   uv.emit('ecProduct', {
     eventType: 'detail',
     product: {
-      sku: {{ product.sku | default: product.variant_id | json }},
-      productId: "{{ product.product_id }}",
+    productId: "{{ product.id | json}}",
+      sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
       name: {{ product.title | json }},
-      manufacturer: {{ product.vendor | json}},
-      stock: {{ product.inventory_quantity }},
+      manufacturer: {{ product.vendor | json }},
+      stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
       price: {
-        currency: "{{ shop.currency }}",
-        value: {{ product.price | divided_by: 100 }}
+        currency: {{ shop.currency | json }},
+        value: {{ product.price | money_without_currency }}
       },
-      url: "{{ product.url }}",
-      description: {{ product.description | strip_html | truncate: 2048 | json }},
+      url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
+      description: {{ product.description | strip_html | strip_newlines | truncate: 2048 | json }},
       categories: ["{{ product.type}}"],
-      images: {{ product.images | json }}
+      images: [ window.location.protocol + "{{ product | img_url: '400x' }}" ]
     }
   })
 ```
@@ -68,9 +69,8 @@ Do not forget to update the Smartserve file name at the top of `qubit-events-tra
 # Useful notes
 
 * There are a lot of inline JavaScript comments within the templates. If you do not want these to be publicly accessible, we recommend removing them.
-* This code in this repository handles the vast majority of the implementation. However if you're looking to do something more custom, additioanl coding may be required.
+* This code in this repository handles the vast majority of the implementation. However if you're looking to do something more custom, additional coding may be required.
 * Any questions please contact [support@qubit.com](mailto:support@qubit.com), we'd be happy to help!
-
 
 
 # Changelog

@@ -1,4 +1,4 @@
-<!-- Qubit Events start -->
+<!-- Qubit Transaction Events start -->
 <script>
   !function(){function n(){function n(n){p.level=n}function e(n,e){p.info(n,"event emitted"),e=c(e||{}),e.meta=e.meta||{},e.meta.type=n,u.push(e),r(),v.listeners=f(v.listeners,function(n){return!n.disposed})}function o(n,e,o){function r(){return p.info("Replaying events"),t(function(){s(v.events,function(t){c.disposed||l(n,t.meta.type)&&e.call(o,t)})}),f}function i(){return p.info("Disposing event handler"),c.disposed=!0,f}p.info("Attaching event handler for",n);var c={type:n,callback:e,disposed:!1,context:o||window};v.listeners.push(c);var f={replay:r,dispose:i};return f}function t(n){p.info("Calling event handlers"),a++;try{n()}catch(n){p.error("UV API Error",n.stack)}a--,r()}function r(){if(0===u.length&&p.info("No more events to process"),u.length>0&&a>0&&p.info("Event will be processed later"),u.length>0&&0===a){p.info("Processing event");var n=u.shift();v.events.push(n),t(function(){s(v.listeners,function(e){if(!e.disposed&&l(e.type,n.meta.type))try{e.callback.call(e.context,n)}catch(n){p.error("Error emitting UV event",n.stack)}})})}}function i(n,e,o){var t=v.on(n,function(){e.apply(o||window,arguments),t.dispose()});return t}function s(n,e){for(var o=n.length,t=0;t<o;t++)e(n[t],t)}function c(n){var e={};for(var o in n)n.hasOwnProperty(o)&&(e[o]=n[o]);return e}function l(n,e){return"string"==typeof n?n===e:n.test(e)}function f(n,e){for(var o=n.length,t=[],r=0;r<o;r++)e(n[r])&&t.push(n[r]);return t}var u=[],a=0,p={info:function(){p.level>n.INFO||console&&console.info&&console.info.apply(console,arguments)},error:function(){p.level>n.ERROR||console&&console.error&&console.error.apply(console,arguments)}};n.ALL=0,n.INFO=1,n.ERROR=2,n.OFF=3,n(n.ERROR);var v={on:o,emit:e,once:i,events:[],listeners:[],logLevel:n};return v}"object"==typeof module&&module.exports?module.exports=n:window&&void 0===window.uv&&(window.uv=n())}();
 </script>
@@ -14,26 +14,60 @@
     config.ns = config.eventNamespace + "."
   } else {
     config.ns=""
-  } 
-
+  }
 
   uv.emit(config.ns + 'ecView', {
     type: "confirmation"
   })
 
+  {% comment %}
+	  User - https://help.shopify.com/themes/liquid/objects/customer
+  {% endcomment %}
+  {% if customer %}
+    uv.emit(config.ns + 'ecUser', {
+      user: {
+          id: "{{ customer.id | json }}",
+          email: {{ customer.email | json }},
+          firstName: {{ customer.first_name | json }},
+          lastName: {{ customer.last_name | json }}
+      }
+    })
+  {% endif %}
+
+
+  {% comment %}
+	  Transaction - https://help.shopify.com/themes/liquid/objects/checkout
+  {% endcomment %}
   var basketSummary = {
     subtotal: {
-      currency: '{{shop.currency}}',
-      value: {{ checkout.total_price | money_without_currency }}
+      currency: {{ shop.currency | json }},
+      value: {{ checkout.subtotal_price | money_without_currency }}
     },
     total: {
-      currency: '{{shop.currency}}',
+      currency: {{ shop.currency | json }},
       value: {{ checkout.total_price | money_without_currency }}
-    }
+    },
+    tax: {
+      currency: {{ shop.currency | json }},
+      value: {{ checkout.tax_price | money_without_currency }}
+    },
+    shippingPrice: {
+      currency: {{ shop.currency | json }},
+      value: {{ checkout.shipping_price | money_without_currency }}
+    },
+    discount: {
+      currency: {{ shop.currency | json }},
+      value: {{ checkout.discounts_amount | money_without_currency }}
+    },
+    subtotalIncludingTax: {
+      currency: {{ shop.currency | json }},
+      value: {{ checkout.subtotal_price | plus: checkout.tax_price | money_without_currency }}
+    },
+    shippingMethod: {{ shipping_method.title | json }}
   }
 
   var transactionSummary = {
-    id: "{{ order_number }}"
+    id: "{{ order.order_number | json }}"
   }
 
   uv.emit(config.ns + 'ecBasketTransactionSummary', {
@@ -46,42 +80,25 @@
       transaction: transactionSummary,
       basket: basketSummary,
       product: {
-        sku: "{{ item.sku | default: item.variant_id }}",
-        productId: "{{ item.product_id }}",
-        name: {{ item.title | json }},
-        manufacturer: {{ item.vendor | json}},
+        productId: "{{ item.product.id | json}}",
+        sku: "{{ item.sku | default: item.variant_id | json }}",
+        name: {{ item.product.title | json }},
+        manufacturer: {{ item.product.vendor | json }},
         price: {
-          currency: "{{ shop.currency }}",
-          value: {{ item.price | divided_by: 100 }}
+          currency: {{ shop.currency | json }},
+          value: {{ item.product.price | money_without_currency }}
         },
-        originalPrice:{
-          currency: "{{ shop.currency }}",
-          value: {{ item.original_line_price | divided_by: 100 }}
-        }, 
-        url: "{{ item.url }}",
-        description: {{ item.product.description | strip_html | truncate: 2048 | json }},
-        categories: [{{ item.product.type | json}}],
-        images: [{{ item.image | json }}]
+        url: window.location.protocol + "{{ item.product.url }}",
+        categories: ["{{ item.product.type}}"]
       }, 
       quantity: {{ item.quantity }},
       subtotal: {
-        currency: "{{ shop.currency }}",
-        value: {{ item.line_price | divided_by: 100 }}
+        currency: {{ shop.currency | json }},
+        value: {{ item.line_price | money_without_currency }}
       }
     })
     {% endfor %}
 
-    {% if customer %} 
-    uv.emit(config.ns+'ecUser', {
-      user: {
-        email: "{{ customer.email }}",
-        id: "{{ customer.id }}",
-        firstName: "{{ customer.first_name }}",
-        lastName: "{{ customer.last_name }}"
-      }
-    })
-    {% endif %}
-
 }());
 </script>
-<!-- Qubit Events end -->
+<!-- Qubit Transaction Events end -->
