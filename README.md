@@ -7,7 +7,7 @@ The code in this repository will take away 95% of the development work required 
 When implementing Qubit, you need to do two things from a technical perspective:
 
 1. Add the Smartserve container to the `<head>` of every page
-2. Emit emits based on user browsing behaviour
+2. Emit events based on user browsing behaviour
 
 The code in this repository handles both of these for you via using Shopify templates. We also bundle the UV API, which sets up an API that acts as a conduit for events. Any script can emit events using the API, even before smartserve.js loads and those events can be read and subscribed to by any script using the API.
 
