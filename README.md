@@ -59,7 +59,7 @@ Note: If you have been given a namespace prefix for your property, prefix it to 
 
 ## Confirmation page
 
-The Shopify template system does now allow codes to be added to the confirmation page (after a purchase has been made), but it does provide separate functionality to what's required.
+The Shopify template system does not allow code to be added to the confirmation page, but it does provide separate mechanism which achieves what is required.
 
 Copy the code from `qubit-events-transaction.liquid` in this repository, and paste it into the textbox found at: "Settings > Checkout > Additional content & scripts".
 
