@@ -37,7 +37,7 @@ If your products have multiple variants (size, color etc) then an additional pro
   uv.emit('ecProduct', {
     eventType: 'detail',
     product: {
-    productId: "{{ product.id | json}}",
+      productId: "{{ product.id | json}}",
       sku: {{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }},
       name: {{ product.title | json }},
       manufacturer: {{ product.vendor | json }},
