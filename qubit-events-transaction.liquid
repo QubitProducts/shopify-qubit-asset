@@ -41,27 +41,27 @@
   var basketSummary = {
     subtotal: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.subtotal_price | money_without_currency }}
+      value: {{ checkout.subtotal_price | money_without_currency | remove: ',' }}
     },
     total: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.total_price | money_without_currency }}
+      value: {{ checkout.total_price | money_without_currency | remove: ',' }}
     },
     tax: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.tax_price | money_without_currency }}
+      value: {{ checkout.tax_price | money_without_currency | remove: ',' }}
     },
     shippingPrice: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.shipping_price | money_without_currency }}
+      value: {{ checkout.shipping_price | money_without_currency | remove: ',' }}
     },
     discount: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.discounts_amount | money_without_currency }}
+      value: {{ checkout.discounts_amount | money_without_currency | remove: ',' }}
     },
     subtotalIncludingTax: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.subtotal_price | plus: checkout.tax_price | money_without_currency }}
+      value: {{ checkout.subtotal_price | plus: checkout.tax_price | money_without_currency | remove: ',' }}
     },
     shippingMethod: {{ shipping_method.title | json }}
   }
@@ -86,7 +86,7 @@
         manufacturer: {{ item.product.vendor | json }},
         price: {
           currency: {{ shop.currency | json }},
-          value: {{ item.product.price | money_without_currency }}
+          value: {{ item.product.price | money_without_currency | remove: ',' }}
         },
         url: window.location.protocol + "{{ item.product.url }}",
         categories: ["{{ item.product.type}}"]
@@ -94,7 +94,7 @@
       quantity: {{ item.quantity }},
       subtotal: {
         currency: {{ shop.currency | json }},
-        value: {{ item.line_price | money_without_currency }}
+        value: {{ item.line_price | money_without_currency | remove: ',' }}
       }
     })
     {% endfor %}
