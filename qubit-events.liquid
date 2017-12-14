@@ -28,6 +28,9 @@
       case "article":
         return "content";
         break;
+      case "blog":
+        return "content";
+        break;
       case "product":
         return "product";
         break;
@@ -76,8 +79,8 @@
     uv.emit(config.ns + 'ecProduct', {
       eventType: 'detail',
       product: {
-        productId: "{{ product.id | json}}",
-        sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+        productId: "{{ product.id | json }}",
+        sku: {{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }},
         name: {{ product.title | json }},
         manufacturer: {{ product.vendor | json }},
         stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
@@ -101,8 +104,8 @@
       uv.emit(config.ns + 'ecProduct', {
         eventType: 'listing',
         product: {
-          productId: "{{ product.id | json}}",
-          sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+          productId: "{{ product.id | json }}",
+          sku: {{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }},
           name: {{ product.title | json }},
           manufacturer: {{ product.vendor | json }},
           stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
@@ -127,7 +130,7 @@
         eventType: 'listing',
         product: {
           productId: "{{ product.id | json}}",
-          sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+          sku: {{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }},
           name: {{ product.title | json }},
           manufacturer: {{ product.vendor | json }},
           stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
@@ -166,7 +169,7 @@
         basket: basketSummary,
         product: {
           productId: "{{ item.product.id | json}}",
-          sku: "{{ item.sku | default: item.variant_id | json }}",
+          sku: {{ item.sku | default: item.variant_id | json }},
           name: {{ item.product.title | json }},
           manufacturer: {{ item.product.vendor | json }},
           price: {
