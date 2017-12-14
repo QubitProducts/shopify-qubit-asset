@@ -83,7 +83,7 @@
         stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
         price: {
           currency: {{ shop.currency | json }},
-          value: {{ product.price | money_without_currency }}
+          value: {{ product.price | money_without_currency | remove: ',' }}
         },
         url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
         description: {{ product.description | strip_html | strip_newlines | truncate: 2048 | json }},
@@ -108,7 +108,7 @@
           stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
           price: {
             currency: {{ shop.currency | json }},
-            value: {{ product.price | money_without_currency }}
+            value: {{ product.price | money_without_currency | remove: ',' }}
           },
           url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
           categories: ["{{ product.type}}"]
@@ -133,7 +133,7 @@
           stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
           price: {
             currency: {{ shop.currency | json }},
-            value: {{ product.price | money_without_currency }}
+            value: {{ product.price | money_without_currency | remove: ',' }}
           },
           url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
           categories: ["{{ product.type}}"]
@@ -149,11 +149,11 @@
     var basketSummary = {
       subtotal: {
         currency: {{ shop.currency | json }},
-        value: {{ cart.total_price | money_without_currency }}
+        value: {{ cart.total_price | money_without_currency | remove: ',' }}
       },
       total: {
         currency: {{ shop.currency | json }},
-        value: {{ cart.total_price | money_without_currency }}
+        value: {{ cart.total_price | money_without_currency | remove: ',' }}
       }
     }
 
@@ -171,7 +171,7 @@
           manufacturer: {{ item.product.vendor | json }},
           price: {
             currency: {{ shop.currency | json }},
-            value: {{ item.product.price | money_without_currency }}
+            value: {{ item.product.price | money_without_currency | remove: ',' }}
           },
           url: window.location.protocol + "//" + window.location.hostname + "{{ item.product.url }}",
           categories: ["{{ item.product.type}}"]
@@ -179,7 +179,7 @@
         quantity: {{ item.quantity }},
         subtotal: {
           currency: {{ shop.currency | json }},
-          value: {{ item.line_price | money_without_currency }}
+          value: {{ item.line_price | money_without_currency | remove: ',' }}
         }
       })
     {% endfor %}
