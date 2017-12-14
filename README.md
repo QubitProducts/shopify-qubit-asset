@@ -38,7 +38,7 @@ If your products have multiple variants (size, color etc) then an additional pro
     eventType: 'detail',
     product: {
     productId: "{{ product.id | json}}",
-      sku: "{{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }}",
+      sku: {{ product.selected_or_first_available_variant.sku | default: product.selected_or_first_available_variant.id | json }},
       name: {{ product.title | json }},
       manufacturer: {{ product.vendor | json }},
       stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
