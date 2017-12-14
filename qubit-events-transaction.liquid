@@ -81,7 +81,7 @@
       basket: basketSummary,
       product: {
         productId: "{{ item.product.id | json}}",
-        sku: "{{ item.sku | default: item.variant_id | json }}",
+        sku: {{ item.sku | default: item.variant_id | json }},
         name: {{ item.product.title | json }},
         manufacturer: {{ item.product.vendor | json }},
         price: {
