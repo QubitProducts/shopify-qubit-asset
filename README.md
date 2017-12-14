@@ -75,6 +75,9 @@ Do not forget to update the Smartserve file name at the top of `qubit-events-tra
 
 # Changelog
 
+### 2.0.1
+Bug fix to strip comma from currencies
+
 ### 2.0.0
 Converted to Qubit event format
 
