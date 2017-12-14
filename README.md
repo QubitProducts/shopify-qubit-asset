@@ -44,7 +44,7 @@ If your products have multiple variants (size, color etc) then an additional pro
       stock: {{ product.selected_or_first_available_variant.inventory_quantity }},
       price: {
         currency: {{ shop.currency | json }},
-        value: {{ product.price | money_without_currency }}
+        value: {{ product.price | money_without_currency | remove: ',' }}
       },
       url: window.location.protocol + "//" + window.location.hostname + "{{ product.url }}",
       description: {{ product.description | strip_html | strip_newlines | truncate: 2048 | json }},
