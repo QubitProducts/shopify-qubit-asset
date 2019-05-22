@@ -53,7 +53,9 @@
 	  Page
   {% endcomment %}
   uv.emit(config.ns + 'ecView', {
-    type: getPageType()
+    type: getPageType(),
+    currency: {{ shop.currency | json }},
+    language: {{ shop.locale | json }}
   })
 
 
