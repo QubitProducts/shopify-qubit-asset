@@ -75,6 +75,9 @@ Do not forget to update the Smartserve file name at the top of `qubit-events-tra
 
 # Changelog
 
+### 2.1.0
+Add `currency` and `language` to `ecView` event
+
 ### 2.0.1
 Bug fix to strip comma from currencies
 
