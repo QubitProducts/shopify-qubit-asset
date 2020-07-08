@@ -41,7 +41,7 @@
   var basketSummary = {
     subtotal: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.subtotal_price | money_without_currency | remove: ',' }}
+      value: {{ checkout.line_items_subtotal_price | money_without_currency | remove: ',' }}
     },
     total: {
       currency: {{ shop.currency | json }},
@@ -61,7 +61,7 @@
     },
     subtotalIncludingTax: {
       currency: {{ shop.currency | json }},
-      value: {{ checkout.subtotal_price | plus: checkout.tax_price | money_without_currency | remove: ',' }}
+      value: {{ checkout.line_items_subtotal_price | plus: checkout.tax_price | money_without_currency | remove: ',' }}
     },
     shippingMethod: {{ shipping_method.title | json }}
   }

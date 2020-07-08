@@ -154,12 +154,13 @@
     var basketSummary = {
       subtotal: {
         currency: {{ shop.currency | json }},
-        value: {{ cart.total_price | money_without_currency | remove: ',' }}
+        value: {{ cart.items_subtotal_price | money_without_currency | remove: ',' }}
       },
       total: {
         currency: {{ shop.currency | json }},
         value: {{ cart.total_price | money_without_currency | remove: ',' }}
-      }
+      },
+      quantity: {{ cart.item_count }}
     }
 
     uv.emit('ecBasketSummary', {
