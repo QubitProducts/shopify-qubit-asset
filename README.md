@@ -11,10 +11,16 @@ When implementing Qubit, you need to do two things from a technical perspective:
 
 The code in this repository handles both of these for you via using Shopify templates. We also bundle the UV API, which sets up an API that acts as a conduit for events. Any script can emit events using the API, even before smartserve.js loads and those events can be read and subscribed to by any script using the API.
 
-__Note__: This repository is not a Shopify App as such, it provides a series of sample logic that can be copied across to your [Shopify templates](http://docs.shopify.com/themes).
+__Note__: This repository is not a Shopify App as such, it provides a series of sample logic that can be copied across to your [Shopify templates](http://docs.shopify.com/themes). It maps data from [Shopify Liquid objects](https://shopify.dev/docs/themes/liquid/reference/objects).
 
 
 # Installation
+
+## Summary
+
+1. Update the Smartserve file at the top of `qubit-events.liquid` and `qubit-events-transaction.liquid` with your own unique id.
+2. Add the `qubit-events.liquid` file from this repository to your store's templates.
+3. Add the `qubit-events-transaction.liquid` file from this repository to your store's checkout settings.
 
 ## Smartserve Script
 
@@ -74,6 +80,10 @@ Do not forget to update the Smartserve file name at the top of `qubit-events-tra
 
 
 # Changelog
+
+### 2.2.0
+Add `basket.quantity` to `ecBasketSummary` and `ecBasketItem` events
+Update outdated liquid specification paths
 
 ### 2.1.0
 Add `currency` and `language` to `ecView` event
