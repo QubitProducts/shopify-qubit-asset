@@ -11,7 +11,7 @@ When implementing Qubit, you need to do two things from a technical perspective:
 
 The code in this repository handles both of these for you via using Shopify templates. We also bundle the UV API, which sets up an API that acts as a conduit for events. Any script can emit events using the API, even before smartserve.js loads and those events can be read and subscribed to by any script using the API.
 
-__Note__: This repository is not a Shopify App as such, it provides a series of sample logic that can be copied across to your [Shopify templates](http://docs.shopify.com/themes).
+__Note__: This repository is not a Shopify App as such, it provides a series of sample logic that can be copied across to your [Shopify templates](http://docs.shopify.com/themes). All Shopify references can be found in the [official documentaiton](https://shopify.dev/docs/themes/liquid/reference/objects).
 
 
 # Installation
